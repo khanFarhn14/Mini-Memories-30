@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "44575558301",
+    "project_id": "mini-memories-30",
+    "storage_bucket": "mini-memories-30.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:44575558301:android:a97bf2e43e5b23200fe274",
+        "android_client_info": {
+          "package_name": "com.example.mini_memories_30"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBI-vz9OPTCnLS2eVVs3I9vOwb72ZNX9Ww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
