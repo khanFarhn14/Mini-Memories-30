@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mini_memories_30/user_interface/pages/routes/route_name.dart';
+import 'package:mini_memories_30/user_interface/routes/route_name.dart';
 
 class PageUsername extends StatefulWidget {
   const PageUsername({super.key});
@@ -22,7 +22,6 @@ class _PageUsernameState extends State<PageUsername> {
   void _confirmSubmission() {
     if (_formKey.currentState!.validate()) {
       // Perform username validation and submission logic here
-      // For demonstration purposes, we'll just print the entered username
       // Reset the form
       _usernameController.clear();
       _formKey.currentState?.reset();
@@ -61,6 +60,7 @@ class _PageUsernameState extends State<PageUsername> {
                     if(value == null || value.isEmpty){
                       return 'username cannot be empty';
                     }
+                    return null;
                   },
                 )
               ),
