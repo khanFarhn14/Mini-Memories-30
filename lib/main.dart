@@ -1,8 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mini_memories_30/firebase_options.dart';
-import 'package:mini_memories_30/user_interface/pages/routes/route_name.dart';
-import 'package:mini_memories_30/user_interface/pages/routes/routes.dart';
+import 'package:mini_memories_30/user_interface/routes/route_name.dart';
+import 'package:mini_memories_30/user_interface/routes/routes.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
