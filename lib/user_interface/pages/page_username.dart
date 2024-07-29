@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mini_memories_30/user_interface/pages/routes/route_name.dart';
 
 class PageUsername extends StatefulWidget {
   const PageUsername({super.key});
@@ -16,6 +17,18 @@ class _PageUsernameState extends State<PageUsername> {
   void dispose() {
     super.dispose();
     _usernameController.dispose();
+  }
+
+  void _confirmSubmission() {
+    if (_formKey.currentState!.validate()) {
+      // Perform username validation and submission logic here
+      // For demonstration purposes, we'll just print the entered username
+      // Reset the form
+      _usernameController.clear();
+      _formKey.currentState?.reset();
+
+      Navigator.popAndPushNamed(context, RouteName.home);
+    }
   }
 
   @override
@@ -42,12 +55,21 @@ class _PageUsernameState extends State<PageUsername> {
                 child: TextFormField(
                   controller: _usernameController,
                   style: Theme.of(context).textTheme.bodyLarge,
+
+                  // validation
+                  validator: (value){
+                    if(value == null || value.isEmpty){
+                      return 'username cannot be empty';
+                    }
+                  },
                 )
               ),
               const SizedBox(height: 48,),
 
               ElevatedButton(
-                onPressed: (){},
+                onPressed: (){
+                  _confirmSubmission();
+                },
                 child: Text("Submit", style: Theme.of(context).textTheme.labelMedium,)
               )
             ],
