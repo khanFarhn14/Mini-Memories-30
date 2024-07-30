@@ -19,6 +19,12 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _videoController.dispose();
+    super.dispose();
+  }
+
   Future<void> _initVideoPlayer() async{
     try{
       _videoController = VideoPlayerController.file(File(widget.videoPath));
