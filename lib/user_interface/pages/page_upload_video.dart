@@ -20,6 +20,7 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _videoTitleController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
 
   final ValueNotifier<bool> _isUploaded = ValueNotifier<bool>(true);
 
@@ -32,6 +33,7 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
   void dispose() {
     _videoController.dispose();
     _videoTitleController.dispose();
+    _usernameController.dispose();
     super.dispose();
   }
 
@@ -60,7 +62,7 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
         Duration duration = _videoController.value.duration;
 
         await uploadFile.uploadVideo(
-          username: 'farhan',
+          username: _usernameController.text,
           videoPath: widget.videoPath,
           videoTitle: _videoTitleController.text,
           duration: duration.inSeconds
@@ -95,12 +97,14 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
                 child: isUploaded ?
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Form(
-                      key: _formKey,
-                      child: TextFormField(
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      
+                      // Video Title
+                      TextFormField(
                         controller: _videoTitleController,
                         style: Theme.of(context).textTheme.bodyLarge,
                         decoration: const InputDecoration(
@@ -110,57 +114,74 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
                         // validation
                         validator: (value){
                           if(value == null || value.isEmpty){
+                            return 'video title cannot be empty';
+                          }
+                          return null;
+                        },
+                      ),
+                                
+                      const SizedBox(height: 16,),
+
+                      // Username
+                      TextFormField(
+                        controller: _usernameController,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        decoration: const InputDecoration(
+                          labelText: 'username',
+                          border: OutlineInputBorder(),
+                        ),
+                        // validation
+                        validator: (value){
+                          if(value == null || value.isEmpty){
                             return 'username cannot be empty';
                           }
                           return null;
                         },
-                      )
-                    ),
-              
-                    const SizedBox(height: 24,),
-              
-                    FutureBuilder(
-                      future: _initVideoPlayer(),
-                      builder: (context, snapshot){
-                        if(snapshot.connectionState == ConnectionState.waiting){
-                          return Text("Video is Loading...", style: Theme.of(context).textTheme.bodyMedium,);
-                        }else if(snapshot.hasError){
-                          return Text("Exception caught when initialization of the video: ${snapshot.error}", style: Theme.of(context).textTheme.bodyMedium,);
-                        }else{
-                          return AspectRatio(
-                            aspectRatio: _videoController.value.aspectRatio,
-                            child: VideoPlayer(_videoController),
-                          );
+                      ),
+                                
+                      FutureBuilder(
+                        future: _initVideoPlayer(),
+                        builder: (context, snapshot){
+                          if(snapshot.connectionState == ConnectionState.waiting){
+                            return Text("Video is Loading...", style: Theme.of(context).textTheme.bodyMedium,);
+                          }else if(snapshot.hasError){
+                            return Text("Exception caught when initialization of the video: ${snapshot.error}", style: Theme.of(context).textTheme.bodyMedium,);
+                          }else{
+                            return AspectRatio(
+                              aspectRatio: _videoController.value.aspectRatio,
+                              child: VideoPlayer(_videoController),
+                            );
+                          }
                         }
-                      }
-                    ),
-              
-                    const SizedBox(height: 24,),
-              
-                    ElevatedButton(
-                      onPressed: (){
-                        _uploadVideo().then((value){
-                            Components.showSnackBarForFeedback(
-                              context: context,
-                              message: 'Video Uploded Successfully',
-                              isError: false
-                            );
-                            Navigator.popAndPushNamed(context, RouteName.home);
-                          }
-                        ).onError((error, stackTrace){
-                            Components.showSnackBarForFeedback(
-                              context: context,
-                              message: '$error',
-                              isError: true
-                            );
-                            Navigator.popAndPushNamed(context, RouteName.home);
-                          }
-                        );
-                      },
-                      child: Text("Upload", style: Theme.of(context).textTheme.labelMedium,)
-                    )
-              
-                  ],
+                      ),
+                                
+                      const SizedBox(height: 24,),
+                                
+                      ElevatedButton(
+                        onPressed: (){
+                          _uploadVideo().then((value){
+                              Components.showSnackBarForFeedback(
+                                context: context,
+                                message: 'Video Uploded Successfully',
+                                isError: false
+                              );
+                              Navigator.popAndPushNamed(context, RouteName.home);
+                            }
+                          ).onError((error, stackTrace){
+                              Components.showSnackBarForFeedback(
+                                context: context,
+                                message: '$error',
+                                isError: true
+                              );
+                              Navigator.popAndPushNamed(context, RouteName.home);
+                            }
+                          );
+                        },
+                        child: Text("Upload", style: Theme.of(context).textTheme.labelMedium,)
+                      )
+                                
+                    ],
+                  ),
                 ) : 
                 Center(
                   child: Text("Video Uploading...", style: Theme.of(context).textTheme.headlineMedium,),
