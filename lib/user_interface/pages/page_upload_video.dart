@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:mini_memories_30/backend/upload_file.dart';
+import 'package:mini_memories_30/user_interface/routes/route_name.dart';
+import 'package:mini_memories_30/user_interface/widgets/components.dart';
 import 'package:video_player/video_player.dart';
 
 class PageUploadVideo extends StatefulWidget {
@@ -66,8 +68,10 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
 
       } on FirebaseException catch (e) {
         clearPrint("Firebase error during upload: ${e.code} - ${e.message}");
+        rethrow;
       } catch (exception) {
         clearPrint("Error during video upload: $exception");
+        rethrow;
       } finally {
         _isUploaded.value = true; 
       }
@@ -121,7 +125,7 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
                         if(snapshot.connectionState == ConnectionState.waiting){
                           return Text("Video is Loading...", style: Theme.of(context).textTheme.bodyMedium,);
                         }else if(snapshot.hasError){
-                          return Text("An error occured", style: Theme.of(context).textTheme.bodyMedium,);
+                          return Text("Exception caught when initialization of the video: ${snapshot.error}", style: Theme.of(context).textTheme.bodyMedium,);
                         }else{
                           return AspectRatio(
                             aspectRatio: _videoController.value.aspectRatio,
@@ -135,21 +139,31 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
               
                     ElevatedButton(
                       onPressed: (){
-                        _uploadVideo();
+                        _uploadVideo().then((value){
+                            Components.showSnackBarForFeedback(
+                              context: context,
+                              message: 'Video Uploded Successfully',
+                              isError: false
+                            );
+                            Navigator.popAndPushNamed(context, RouteName.home);
+                          }
+                        ).onError((error, stackTrace){
+                            Components.showSnackBarForFeedback(
+                              context: context,
+                              message: '$error',
+                              isError: true
+                            );
+                            Navigator.popAndPushNamed(context, RouteName.home);
+                          }
+                        );
                       },
                       child: Text("Upload", style: Theme.of(context).textTheme.labelMedium,)
                     )
               
                   ],
                 ) : 
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: Text("Video Uploading...", style: Theme.of(context).textTheme.headlineMedium,),
-                    )
-                  ],
+                Center(
+                  child: Text("Video Uploading...", style: Theme.of(context).textTheme.headlineMedium,),
                 )
               );
             }
