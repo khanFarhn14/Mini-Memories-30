@@ -39,6 +39,7 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
       await _videoController.initialize();
       _videoController.play();
       await _videoController.setLooping(true);
+
     }catch(exception){
       clearPrint("Exception in _initVideoPlayer: $exception");
       rethrow;
@@ -50,20 +51,23 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
       _isUploaded.value = false;
 
       try {
-        UploadFile uploadFile = UploadFile();
-
-        clearPrint('_uploadVideo parameter: ${widget.videoPath}');
-        await uploadFile.uploadVideo(
-          videoPath: widget.videoPath,
-          videoTitle: _videoTitleController.text
+        UploadFile uploadFile = UploadFile(
+          context: context
         );
-        clearPrint("Video uploaded successfully");
+
+        Duration duration = _videoController.value.duration;
+
+        await uploadFile.uploadVideo(
+          username: 'farhan',
+          videoPath: widget.videoPath,
+          videoTitle: _videoTitleController.text,
+          duration: duration.inSeconds
+        );
+
       } on FirebaseException catch (e) {
         clearPrint("Firebase error during upload: ${e.code} - ${e.message}");
-        // Handle Firebase-specific errors
       } catch (exception) {
         clearPrint("Error during video upload: $exception");
-        // Handle other errors
       } finally {
         _isUploaded.value = true; 
       }
@@ -138,9 +142,15 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
               
                   ],
                 ) : 
-                Center(
-                  child: Text("Video Uploading", style: Theme.of(context).textTheme.headlineMedium,),
-                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Text("Video Uploading...", style: Theme.of(context).textTheme.headlineMedium,),
+                    )
+                  ],
+                )
               );
             }
           ),
