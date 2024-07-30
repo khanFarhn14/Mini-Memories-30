@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:mini_memories_30/backend/upload_file.dart';
 import 'package:video_player/video_player.dart';
 
 class PageUploadVideo extends StatefulWidget {
@@ -14,6 +16,11 @@ class PageUploadVideo extends StatefulWidget {
 class _PageUploadVideoState extends State<PageUploadVideo> {
   late VideoPlayerController _videoController;
 
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _videoTitleController = TextEditingController();
+
+  final ValueNotifier<bool> _isUploaded = ValueNotifier<bool>(true);
+
   @override
   void initState() {
     super.initState();
@@ -22,6 +29,7 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
   @override
   void dispose() {
     _videoController.dispose();
+    _videoTitleController.dispose();
     super.dispose();
   }
 
@@ -36,6 +44,32 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
       rethrow;
     }
   }
+
+  Future<void> _uploadVideo() async {
+    if (_formKey.currentState!.validate()) {
+      _isUploaded.value = false;
+
+      try {
+        UploadFile uploadFile = UploadFile();
+
+        clearPrint('_uploadVideo parameter: ${widget.videoPath}');
+        await uploadFile.uploadVideo(
+          videoPath: widget.videoPath,
+          videoTitle: _videoTitleController.text
+        );
+        clearPrint("Video uploaded successfully");
+      } on FirebaseException catch (e) {
+        clearPrint("Firebase error during upload: ${e.code} - ${e.message}");
+        // Handle Firebase-specific errors
+      } catch (exception) {
+        clearPrint("Error during video upload: $exception");
+        // Handle other errors
+      } finally {
+        _isUploaded.value = true; 
+      }
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -47,43 +81,68 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
 
         body: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Video", style: Theme.of(context).textTheme.titleMedium,),
-          
-                const SizedBox(height: 24,),
-          
-                FutureBuilder(
-                  future: _initVideoPlayer(),
-                  builder: (context, snapshot){
-                    if(snapshot.connectionState == ConnectionState.waiting){
-                      return Text("Video is Loading...", style: Theme.of(context).textTheme.bodyMedium,);
-                    }else if(snapshot.hasError){
-                      return Text("An error occured", style: Theme.of(context).textTheme.bodyMedium,);
-                    }else{
-                      return AspectRatio(
-                        aspectRatio: _videoController.value.aspectRatio,
-                        child: VideoPlayer(_videoController),
-                      );
-                    }
-                  }
+          child: ValueListenableBuilder(
+            valueListenable: _isUploaded,
+            builder: (context, isUploaded, child) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+                child: isUploaded ?
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Form(
+                      key: _formKey,
+                      child: TextFormField(
+                        controller: _videoTitleController,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        decoration: const InputDecoration(
+                          labelText: 'Video Title',
+                          border: OutlineInputBorder(),
+                        ),
+                        // validation
+                        validator: (value){
+                          if(value == null || value.isEmpty){
+                            return 'username cannot be empty';
+                          }
+                          return null;
+                        },
+                      )
+                    ),
+              
+                    const SizedBox(height: 24,),
+              
+                    FutureBuilder(
+                      future: _initVideoPlayer(),
+                      builder: (context, snapshot){
+                        if(snapshot.connectionState == ConnectionState.waiting){
+                          return Text("Video is Loading...", style: Theme.of(context).textTheme.bodyMedium,);
+                        }else if(snapshot.hasError){
+                          return Text("An error occured", style: Theme.of(context).textTheme.bodyMedium,);
+                        }else{
+                          return AspectRatio(
+                            aspectRatio: _videoController.value.aspectRatio,
+                            child: VideoPlayer(_videoController),
+                          );
+                        }
+                      }
+                    ),
+              
+                    const SizedBox(height: 24,),
+              
+                    ElevatedButton(
+                      onPressed: (){
+                        _uploadVideo();
+                      },
+                      child: Text("Upload", style: Theme.of(context).textTheme.labelMedium,)
+                    )
+              
+                  ],
+                ) : 
+                Center(
+                  child: Text("Video Uploading", style: Theme.of(context).textTheme.headlineMedium,),
                 ),
-
-                const SizedBox(height: 24,),
-
-                ElevatedButton(
-                  onPressed: (){},
-                  child: Text("Upload", style: Theme.of(context).textTheme.labelMedium,)
-                )
-
-
-          
-          
-              ],
-            ),
+              );
+            }
           ),
         ),
       )
