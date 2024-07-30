@@ -3,15 +3,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-class PageNewRecordVideo extends StatefulWidget {
+class PageUploadVideo extends StatefulWidget {
   final String videoPath;
-  const PageNewRecordVideo({super.key, required this.videoPath});
+  const PageUploadVideo({super.key, required this.videoPath});
 
   @override
-  State<PageNewRecordVideo> createState() => _PageNewRecordVideoState();
+  State<PageUploadVideo> createState() => _PageUploadVideoState();
 }
 
-class _PageNewRecordVideoState extends State<PageNewRecordVideo> {
+class _PageUploadVideoState extends State<PageUploadVideo> {
   late VideoPlayerController _videoController;
 
   @override

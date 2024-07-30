@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mini_memories_30/user_interface/pages/page_new_record_video.dart';
+import 'package:mini_memories_30/user_interface/pages/page_upload_video.dart';
 
 class PageHome extends StatefulWidget {
   const PageHome({super.key});
@@ -32,7 +32,7 @@ class PageHomeState extends State<PageHome> {
       clearPrint("Video Capture: ${cameraVideo.path}");
       final route = MaterialPageRoute(
         fullscreenDialog: true,
-        builder: (_) => PageNewRecordVideo(videoPath: cameraVideo.path),
+        builder: (_) => PageUploadVideo(videoPath: cameraVideo.path),
       );
       // ignore: use_build_context_synchronously
       Navigator.push(context, route);
