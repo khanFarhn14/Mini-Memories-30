@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mini_memories_30/user_interface/pages/page_upload_video.dart';
+import 'package:mini_memories_30/user_interface/widgets/components.dart';
 
 class PageHome extends StatefulWidget {
   const PageHome({super.key});
@@ -16,28 +17,29 @@ class PageHomeState extends State<PageHome> {
     super.dispose();
   }
 
-  _recordVideo() async{
+  Future<void> _recordVideo() async{
     try{
       final ImagePicker picker = ImagePicker();
-      final XFile? cameraVideo = await picker.pickVideo(
+
+      await picker.pickVideo(
         source: ImageSource.camera,
         maxDuration: const Duration(seconds: 15),
         preferredCameraDevice: CameraDevice.front,
+      ).then((value){
+          if(value != null){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                fullscreenDialog: true,
+                builder: (_) => PageUploadVideo(videoPath: value.path),
+              )
+            );
+          }
+        }
       );
-      if(cameraVideo == null){
-        clearPrint("No Capture Null");
-        return;
-      }
-
-      clearPrint("Video Capture: ${cameraVideo.path}");
-      final route = MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => PageUploadVideo(videoPath: cameraVideo.path),
-      );
-      // ignore: use_build_context_synchronously
-      Navigator.push(context, route);
+      
     }catch(exception){
-      clearPrint("Exception caught in _recordVideo: $exception");
+      rethrow;
     }
   }
   @override
@@ -49,7 +51,14 @@ class PageHomeState extends State<PageHome> {
 
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          _recordVideo();
+          _recordVideo().onError((error, stackTrace){
+              Components.showSnackBarForFeedback(
+                context: context, 
+                message: 'Exception when recording video: $error',
+                isError: true
+              );
+            }
+          );
         },
         child: const Icon(
           Icons.video_camera_back_outlined
