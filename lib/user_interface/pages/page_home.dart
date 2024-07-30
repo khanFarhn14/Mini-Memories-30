@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mini_memories_30/backend/fetch_file.dart';
 import 'package:mini_memories_30/user_interface/pages/page_upload_video.dart';
 import 'package:mini_memories_30/user_interface/widgets/components.dart';
+import 'package:mini_memories_30/user_interface/widgets/show_video.dart';
 
 class PageHome extends StatefulWidget {
   const PageHome({super.key});
@@ -11,6 +14,8 @@ class PageHome extends StatefulWidget {
 }
 
 class PageHomeState extends State<PageHome> {
+
+  final FetchFile _fetchFile = FetchFile();
 
   @override
   void dispose() {
@@ -37,16 +42,47 @@ class PageHomeState extends State<PageHome> {
           }
         }
       );
-      
+
     }catch(exception){
       rethrow;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: const Center(
-        child: Text("This is Feed Page"),
+      appBar: AppBar(
+        title: Text("Enjoy the Feed", style: Theme.of(context).textTheme.titleMedium,),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+        child: FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          future: _fetchFile.getAllContent(),
+          builder: (context, snapshot){
+            if(snapshot.connectionState == ConnectionState.waiting){
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.purple, strokeWidth: 1.5,)
+              );
+            }else if(snapshot.hasData){
+              return ListView.builder(
+                addAutomaticKeepAlives: true,
+                itemCount: snapshot.data!.docs.length,
+                itemBuilder: (context, index){
+                  return ShowVideo(
+                    username: snapshot.data!.docs[index]['username'],
+                    createdAt: snapshot.data!.docs[index]['createdAt'].toString(),
+                    url: snapshot.data!.docs[index]['url'],
+                  );
+                }
+              );
+            }else{
+              return Center(
+                child: Text("Exception caught: ${snapshot.error}", style: Theme.of(context).textTheme.bodyMedium,)
+              );
+            }
+          }
+        ),
       ),
 
       floatingActionButton: FloatingActionButton(
