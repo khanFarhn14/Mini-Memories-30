@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:mini_memories_30/firebase_options.dart';
 import 'package:mini_memories_30/user_interface/routes/route_name.dart';
 import 'package:mini_memories_30/user_interface/routes/routes.dart';
+import 'package:mini_memories_30/user_interface/state-management/upload_progress.dart';
+import 'package:provider/provider.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,10 +19,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: RouteName.username,
-      onGenerateRoute: Routes.generateRoute,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => UploadProgress()),
+      ],
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        initialRoute: RouteName.username,
+        onGenerateRoute: Routes.generateRoute,
+      ),
     );
   }
 }
