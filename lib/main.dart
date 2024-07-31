@@ -23,9 +23,10 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => UploadProgress()),
       ],
-      child: const MaterialApp(
+      child: MaterialApp(
+        darkTheme: ThemeData.dark(),
         debugShowCheckedModeBanner: false,
-        initialRoute: RouteName.username,
+        initialRoute: RouteName.home,
         onGenerateRoute: Routes.generateRoute,
       ),
     );
