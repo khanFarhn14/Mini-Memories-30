@@ -55,34 +55,32 @@ class PageHomeState extends State<PageHome> {
         title: Text("Enjoy the Feed", style: Theme.of(context).textTheme.titleMedium,),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
-        child: FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          future: _fetchFile.getAllContent(),
-          builder: (context, snapshot){
-            if(snapshot.connectionState == ConnectionState.waiting){
-              return const Center(
-                child: CircularProgressIndicator(color: Colors.purple, strokeWidth: 1.5,)
-              );
-            }else if(snapshot.hasData){
-              return ListView.builder(
-                addAutomaticKeepAlives: true,
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (context, index){
-                  return ShowVideo(
-                    username: snapshot.data!.docs[index]['username'],
-                    createdAt: snapshot.data!.docs[index]['createdAt'].toString(),
-                    url: snapshot.data!.docs[index]['url'],
-                  );
-                }
-              );
-            }else{
-              return Center(
-                child: Text("Exception caught: ${snapshot.error}", style: Theme.of(context).textTheme.bodyMedium,)
-              );
-            }
+      body: FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        future: _fetchFile.getAllContent(),
+        builder: (context, snapshot){
+          if(snapshot.connectionState == ConnectionState.waiting){
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.purple, strokeWidth: 1.5,)
+            );
+          }else if(snapshot.hasData){
+            return PageView.builder(
+              physics: const BouncingScrollPhysics(),
+              scrollDirection: Axis.vertical,
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (context, index){
+                return ShowVideo(
+                  username: snapshot.data!.docs[index]['username'],
+                  createdAt: snapshot.data!.docs[index]['createdAt'].toString(),
+                  url: snapshot.data!.docs[index]['url'],
+                );
+              }
+            );
+          }else{
+            return Center(
+              child: Text("Exception caught: ${snapshot.error}", style: Theme.of(context).textTheme.bodyMedium,)
+            );
           }
-        ),
+        }
       ),
 
       floatingActionButton: FloatingActionButton(
