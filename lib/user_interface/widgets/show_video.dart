@@ -17,13 +17,14 @@ class _ShowVideoState extends State<ShowVideo> {
   @override
   void dispose() {
     _videoPlayerController.dispose();
+    _isPlayingNotifier.dispose();
     super.dispose();
   }
 
   Future<void> _initVideoPlayer() async {
     _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(widget.url));
     await _videoPlayerController.initialize();
-    // _videoPlayerController.play();
+    _videoPlayerController.play();
     await _videoPlayerController.setLooping(true);
   }
 
@@ -40,37 +41,28 @@ class _ShowVideoState extends State<ShowVideo> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Username: ${widget.username}', style: Theme.of(context).textTheme.bodyMedium,),
+                const SizedBox(height: 24,),
+
+                // Name
+                  Text.rich(
+                    TextSpan(
+                      text: 'username: ',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      children: [
+                        TextSpan(
+                          text: widget.username.toUpperCase(),
+                          style: Theme.of(context).textTheme.titleMedium
+                        )
+                      ]
+                    )
+                  ),
 
                 const SizedBox(height: 12,),
                 
                 AspectRatio(
-                  aspectRatio: _videoPlayerController.value.aspectRatio,
+                  aspectRatio: 9/16,
                   child: VideoPlayer(_videoPlayerController)
                 ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween, 
-                  children: [
-                    ValueListenableBuilder(
-                      valueListenable: _isPlayingNotifier,
-                      builder: (context, isPlaying, child) {
-                        return ElevatedButton(
-                          onPressed: (){
-                            if(isPlaying) {
-                              _isPlayingNotifier.value = false;
-                              _videoPlayerController.pause();
-                            }else{
-                              _isPlayingNotifier.value = true;
-                              _videoPlayerController.play();
-                            }
-                          }, 
-                          child: isPlaying ? const Icon(Icons.pause) : const Icon(Icons.play_arrow)
-                        );
-                      }
-                    ),
-                  ],
-                )
               ],
             );
           }
