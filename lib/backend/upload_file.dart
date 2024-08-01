@@ -18,9 +18,9 @@ class UploadFile {
       throw Exception("Video file not found");
     }
     
-    final Reference ref = _storage.ref().child('memories/$videoTitle.mp4');
 
     try {
+      final Reference ref = _storage.ref().child('memories/$videoTitle.mp4');
       final UploadTask uploadTask = ref.putFile(file);
 
       await uploadTask;
