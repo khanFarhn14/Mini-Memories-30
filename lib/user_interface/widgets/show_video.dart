@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:mini_memories_30/user_interface/pages/page_upload_video.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 
 class ShowVideo extends StatefulWidget {
   final String url, username, createdAt;
-  const ShowVideo({super.key, required this.url, required this.username, required this.createdAt});
+  final int index;
+  const ShowVideo({super.key, required this.url, required this.username, required this.createdAt, required this.index});
 
   @override
   State<ShowVideo> createState() => _ShowVideoState();
@@ -13,11 +18,17 @@ class _ShowVideoState extends State<ShowVideo> {
   late VideoPlayerController _videoPlayerController;
   final ValueNotifier<bool> _isPlayingNotifier = ValueNotifier<bool>(true);
 
-
+  @override
+  void initState() {
+    // clearPrint("Initializing video at index: ${widget.index}");
+    super.initState();
+  }
   @override
   void dispose() {
+    // clearPrint("Disposing video at index: ${widget.index}");
     _videoPlayerController.dispose();
     _isPlayingNotifier.dispose();
+    clearVideoPlayerCache();
     super.dispose();
   }
 
@@ -26,6 +37,21 @@ class _ShowVideoState extends State<ShowVideo> {
     await _videoPlayerController.initialize();
     _videoPlayerController.play();
     await _videoPlayerController.setLooping(true);
+  }
+
+  Future<void> clearVideoPlayerCache() async {
+    final cacheDir = await getTemporaryDirectory();
+    if (cacheDir.existsSync()) {
+      clearPrint("cacheDir.exists init loop");
+      cacheDir.listSync().forEach((file) {
+        if (file is File && file.path.contains('libCachedVideoPlayer')) {
+          clearPrint("Deleting something I don't know in the loop");
+          file.deleteSync();
+        }
+      });
+    }else{
+      clearPrint("cacheDir doesnt exist");
+    }
   }
 
   void _changeStateOfVideo() {
