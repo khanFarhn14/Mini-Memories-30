@@ -38,46 +38,33 @@ class PageHomeState extends State<PageHome> {
       );
 
       if(videoFile != null){
+
+        // Compressing the video
         await compressVideo(videoFile.path).then((value) async{
-            value != null ? Navigator.push(
+            Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => PageUploadVideo(videoPath: value)
               )
-            ) : Components.showSnackBarForFeedback(
-              context: context,
-              message: 'Null value is returned',
-              isError: true
             );
           }
         );
-        // await videoFile.length().then((value){
-        //     String fileSize = getFileSize(value, 2);
-        //     clearPrint("Size of the file: $fileSize");
-        //     Navigator.push(
-        //       context,
-        //       MaterialPageRoute(
-        //         builder: (context) => PageUploadVideo(videoPath: videoFile.path),
-        //       )
-        //     );
-        //   }
-        // );
       }
 
     }catch(exception){
+      // throwing exception to function caller
       rethrow;
     }finally{
       _isLoadingNotifier.value = false;
     }
   }
 
-  Future<String?> compressVideo(String videoPath) async {
+  Future<String> compressVideo(String videoPath) async {
     try {
       final MediaInfo mediaInfo = await VideoCompress.getMediaInfo(videoPath);
       
       if (mediaInfo.path == null) {
-        clearPrint('Failed to get media info');
-        return null;
+        throw Exception("Failed to get media info");
       }
 
       // Check if the video exceeds 1920x1080
@@ -92,14 +79,12 @@ class PageHomeState extends State<PageHome> {
           await VideoCompress.deleteAllCache();
           return compressedInfo.file!.path;
         }
-      } else {
-        clearPrint('Video is already within desired resolution');
-        return videoPath;
       }
-      return null;
+
+      return videoPath;
     } catch (e) {
       clearPrint('Error compressing video: $e');
-      return null;
+      rethrow;
     }
   }
 
@@ -121,6 +106,7 @@ class PageHomeState extends State<PageHome> {
       body: ValueListenableBuilder(
         valueListenable: _isLoadingNotifier,
         builder: (context, isLoading, child) {
+          // if user is recording video the loading will set to true
           return isLoading ? 
           const Center(child: CircularProgressIndicator(color: Colors.purple,)) 
           : // else 
