@@ -41,6 +41,7 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
     try{
       _videoController = VideoPlayerController.file(File(widget.videoPath));
       await _videoController.initialize();
+      _videoController.setVolume(0);
       _videoController.play();
       await _videoController.setLooping(true);
 
