@@ -11,7 +11,7 @@ class Components{
         behavior: SnackBarBehavior.floating,
         elevation: 0,
         margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         backgroundColor: const Color(0xff000000),
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8)
@@ -21,14 +21,17 @@ class Components{
             isError ? const Icon(Icons.error_outline_rounded, color: Colors.red,size: 24,):
             const Icon(Icons.done, color: Colors.green,size: 24,),
             const SizedBox(width: 12,),
-            Text(
-                message,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
-                textAlign: TextAlign.start,
+            Expanded(
+              child: Text(
+                  message,
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                  textAlign: TextAlign.start,
+                  softWrap: true,
+              ),
             ),
           ],
         ),
-        duration: const Duration(milliseconds: 800),
+        duration: const Duration(milliseconds: 2000),
       )
     );
   }
