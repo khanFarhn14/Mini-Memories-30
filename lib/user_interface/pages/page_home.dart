@@ -76,8 +76,23 @@ class PageHomeState extends State<PageHome> {
               }
             );
           }else{
-            return Center(
-              child: Text("Exception caught: ${snapshot.error}", style: Theme.of(context).textTheme.bodyMedium,)
+            return Container(
+              width: double.infinity,
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Icon(
+                    Icons.error,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(width: 12,),
+
+                  Expanded(
+                    child: Text("${snapshot.error}", style: Theme.of(context).textTheme.titleSmall,)
+                  ),
+                ],
+              )
             );
           }
         }
