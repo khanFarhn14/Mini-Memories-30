@@ -51,6 +51,25 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
     }
   }
 
+  Future<void> deleteVideoFile(String filePath) async {
+    final file = File(filePath);
+    if (await file.exists()) {
+      await file.delete().then((value){
+          clearPrint('File deleted successfully');
+        }
+      ).catchError((error){
+          Components.showSnackBarForFeedback(
+            context: context,
+            message: 'An error has occurred while clearing cache: $error',
+            isError: true
+          );
+        }
+      );
+    }else{
+      clearPrint("File doesn't exist");
+    }
+  }
+  
   Future<void> _uploadVideo() async {
     if (_formKey.currentState!.validate()) {
       _isUploaded.value = false;
@@ -69,6 +88,8 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
           videoTitle: _videoTitleController.text,
           duration: duration.inSeconds
         );
+
+        await deleteVideoFile(widget.videoPath);
 
       } on FirebaseException catch (e) {
         clearPrint("Firebase error during upload: ${e.code} - ${e.message}");
