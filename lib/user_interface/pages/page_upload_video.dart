@@ -53,6 +53,7 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
   Future<void> _uploadVideo() async {
     if (_formKey.currentState!.validate()) {
       _isUploaded.value = false;
+      _videoController.pause();
 
       try {
         UploadFile uploadFile = UploadFile(
@@ -118,8 +119,7 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
                           }
                           return null;
                         },
-                      ),
-                                
+                      ),        
                       const SizedBox(height: 16,),
 
                       // Username
@@ -138,6 +138,7 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
                           return null;
                         },
                       ),
+                      const SizedBox(height: 16,),
                                 
                       FutureBuilder(
                         future: _initVideoPlayer(),
@@ -173,7 +174,7 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
                                 message: '$error',
                                 isError: true
                               );
-                              Navigator.popAndPushNamed(context, RouteName.home);
+                              Navigator.pushNamedAndRemoveUntil(context, RouteName.home, (value) => false);
                             }
                           );
                         },
@@ -183,8 +184,19 @@ class _PageUploadVideoState extends State<PageUploadVideo> {
                     ],
                   ),
                 ) : 
-                Center(
-                  child: Text("Video Uploading...", style: Theme.of(context).textTheme.headlineMedium,),
+                const Column(
+                  children: [
+                    Center(
+                      child: SizedBox(
+                        width: 32,
+                        height: 32,
+                        child: CircularProgressIndicator(
+                          color: Colors.purple,
+                          strokeWidth: 1.5,
+                        ),
+                      ),
+                    )
+                  ],
                 )
               );
             }
