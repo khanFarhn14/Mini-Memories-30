@@ -11,7 +11,7 @@ class ShowVideo extends StatefulWidget {
 
 class _ShowVideoState extends State<ShowVideo> {
   late VideoPlayerController _videoPlayerController;
-  final ValueNotifier<bool> _isPlayingNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _isPlayingNotifier = ValueNotifier<bool>(true);
 
 
   @override
@@ -28,6 +28,16 @@ class _ShowVideoState extends State<ShowVideo> {
     await _videoPlayerController.setLooping(true);
   }
 
+  void _changeStateOfVideo() {
+    if(_isPlayingNotifier.value){
+      _videoPlayerController.pause();
+      _isPlayingNotifier.value = false;
+    }else{
+      _videoPlayerController.play();
+      _isPlayingNotifier.value = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -38,13 +48,31 @@ class _ShowVideoState extends State<ShowVideo> {
           } else if(state.hasError){
             return const Center(child: Text('Failed to load video'));
           }else{
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            return Stack(
+              alignment: Alignment.center,
               children: [
                 const SizedBox(height: 24,),
 
+                ValueListenableBuilder(
+                  valueListenable: _isPlayingNotifier,
+                  builder: (context, isPlaying, child) {
+                    return InkWell(
+                      onTap: (){
+                        _changeStateOfVideo();
+                      },
+                      child: AspectRatio(
+                        aspectRatio: _videoPlayerController.value.aspectRatio,
+                        child: VideoPlayer(_videoPlayerController)
+                      ),
+                    );
+                  }
+                ),
+
                 // Name
-                  Text.rich(
+                Positioned(
+                  bottom: 24,
+                  left: 16,
+                  child: Text.rich(
                     TextSpan(
                       text: 'username: ',
                       style: Theme.of(context).textTheme.bodyMedium,
@@ -56,13 +84,18 @@ class _ShowVideoState extends State<ShowVideo> {
                       ]
                     )
                   ),
-
-                const SizedBox(height: 12,),
-                
-                AspectRatio(
-                  aspectRatio: 9/16,
-                  child: VideoPlayer(_videoPlayerController)
                 ),
+
+                ValueListenableBuilder(
+                  valueListenable: _isPlayingNotifier,
+                  builder: (context, isPlaying, child) {
+                    return Icon(
+                      isPlaying ? Icons.pause : Icons.play_arrow_rounded,
+                      size: 58,
+                      color: isPlaying ? Colors.transparent : Colors.white,
+                    );
+                  }
+                )
               ],
             );
           }
